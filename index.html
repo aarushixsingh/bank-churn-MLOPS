@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Churn Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f2f8;
+      color: #1a1d2e;
+      min-height: 100vh;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #e2e6f0;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header svg { color: #3b5bdb; }
+
+    header h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a1d2e;
+    }
+
+    header span {
+      margin-left: auto;
+      font-size: 13px;
+      color: #7b82a8;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1d2e;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title svg { color: #3b5bdb; }
+
+    .field { margin-bottom: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #7b82a8;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .field input, .field select {
+      width: 100%;
+      background: #f8f9ff;
+      border: 1px solid #e2e6f0;
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: #1a1d2e;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field input:focus, .field select:focus { border-color: #3b5bdb; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8f9ff;
+      border: 1px solid #e2e6f0;
+      border-radius: 8px;
+      padding: 11px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-row span { font-size: 14px; color: #1a1d2e; }
+
+    .toggle {
+      width: 42px; height: 24px;
+      border-radius: 12px;
+      background: #d0d5e8;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle.on { background: #3b5bdb; }
+
+    .toggle::after {
+      content: '';
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: white;
+      position: absolute;
+      top: 3px; left: 3px;
+      transition: left 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .toggle.on::after { left: 21px; }
+
+    .predict-btn {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 13px;
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s;
+      letter-spacing: -0.2px;
+    }
+
+    .predict-btn:hover { background: #1e40af; }
+    .predict-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .right-col { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .verdict-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 4px solid #2dd4a0;
+    }
+
+    .verdict-card.churn { border-top-color: #f75c5c; }
+
+    .verdict-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: #7b82a8;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .verdict-title {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #2dd4a0;
+    }
+
+    .verdict-title.churn { color: #f75c5c; }
+
+    .verdict-sub { font-size: 13px; color: #7b82a8; }
+
+    .verdict-right { text-align: right; }
+
+    .prob-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #7b82a8;
+      margin-bottom: 2px;
+    }
+
+    .prob-value {
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1;
+      color: #1a1d2e;
+    }
+
+    .prob-pct { font-size: 24px; }
+
+    .risk-label { font-size: 12px; color: #7b82a8; margin-top: 6px; }
+
+    .risk-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 12px;
+      border-radius: 20px;
+      margin-left: 6px;
+    }
+
+    .risk-badge.low { background: #d1fae5; color: #065f46; }
+    .risk-badge.medium { background: #fef3c7; color: #92400e; }
+    .risk-badge.high { background: #fee2e2; color: #991b1b; }
+
+    .explain-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .explain-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1d2e;
+      margin-bottom: 4px;
+    }
+
+    .explain-sub {
+      font-size: 12px;
+      color: #7b82a8;
+      margin-bottom: 1.25rem;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .bar-label {
+      font-size: 13px;
+      color: #7b82a8;
+      width: 130px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .bar-center-track {
+      flex: 1;
+      height: 10px;
+      background: #f0f2f8;
+      border-radius: 5px;
+      position: relative;
+    }
+
+    .bar-center-line {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      background: #d0d5e8;
+    }
+
+    .bar-fill-center {
+      position: absolute;
+      height: 100%;
+      border-radius: 5px;
+      top: 0;
+      transition: width 0.5s ease;
+    }
+
+    .bar-fill-center.pos {
+      background: #f75c5c;
+      left: 50%;
+    }
+
+    .bar-fill-center.neg {
+      background: #2dd4a0;
+      right: 50%;
+    }
+
+    .bar-tooltip {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: -36px;
+      background: #1a1d2e;
+      color: white;
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .bar-row:hover .bar-tooltip { display: block; }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 340px;
+      color: #7b82a8;
+      gap: 12px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .empty-state p { font-size: 14px; }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+  <h1>Churn Predictor</h1>
+  <span>Bank Customer Retention Intelligence</span>
+</header>
+
+<div class="main">
+
+  <div class="card">
+    <div class="card-title">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Customer details
+    </div>
+
+    <div class="field">
+      <label>Customer name (optional)</label>
+      <input type="text" id="customer_name" placeholder="Enter customer name" />
+    </div>
+
+    <div class="form-grid">
+      <div class="field">
+        <label>Credit score</label>
+        <input type="number" id="credit_score" value="651" />
+      </div>
+      <div class="field">
+        <label>Age</label>
+        <input type="number" id="age" value="38" />
+      </div>
+      <div class="field">
+        <label>Tenure (years)</label>
+        <input type="number" id="tenure" value="7" />
+      </div>
+      <div class="field">
+        <label>Balance</label>
+        <input type="number" id="balance" value="75000" />
+      </div>
+      <div class="field">
+        <label>Number of products</label>
+        <input type="number" id="products_number" value="1" min="1" max="4" />
+    </div>
+      <div class="field">
+        <label>Estimated salary</label>
+        <input type="number" id="estimated_salary" value="100000" />
+      </div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleField('credit_card')">
+      <span>Has credit card</span>
+      <div class="toggle on" id="toggle_credit_card"></div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleField('active_member')">
+      <span>Active member</span>
+      <div class="toggle on" id="toggle_active_member"></div>
+    </div>
+
+    <button class="predict-btn" onclick="predict()" id="predict-btn">
+      Predict churn
+    </button>
+  </div>
+
+  <div class="right-col" id="right-col">
+    <div class="empty-state">
+      <svg width="40" height="40" fill="none" stroke="#d0d5e8" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p>Fill in customer details and click Predict</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const toggleState = { credit_card: 1, active_member: 1 };
+
+  function toggleField(name) {
+    toggleState[name] = toggleState[name] === 1 ? 0 : 1;
+    document.getElementById('toggle_' + name).classList.toggle('on', toggleState[name] === 1);
+  }
+
+  function getRisk(prob) {
+    if (prob < 0.3) return { label: 'Low', cls: 'low' };
+    if (prob < 0.6) return { label: 'Medium', cls: 'medium' };
+    return { label: 'High', cls: 'high' };
+  }
+
+  function getExplanation(impact, prediction, prob, name) {
+    const labels = {
+      credit_score: 'credit score', age: 'age', tenure: 'tenure',
+      balance: 'account balance', products_number: 'number of products',
+      credit_card: 'credit card status', active_member: 'account activity',
+      estimated_salary: 'estimated salary'
+    };
+    const sorted = Object.entries(impact).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+    const top = sorted.slice(0, 3);
+    const customer = name ? name : 'This customer';
+    const pct = Math.round(prob * 100);
+    const reasons = top.map(([k, v]) => v > 0 ? `${labels[k]} signals risk` : `${labels[k]} is a stabilising factor`);
+
+    if (prediction === 1) {
+      return `${customer} has a <strong>${pct}%</strong> probability of churning. The prediction is primarily driven by ${reasons[0]}, followed by ${reasons[1]}. ${reasons[2] ? `Additionally, ${reasons[2]}.` : ''} A retention offer is recommended.`;
+    } else {
+      return `${customer} has only a <strong>${pct}%</strong> probability of churning — they are likely to stay. The model is confident because ${reasons[0]}, and ${reasons[1]}. No immediate action needed.`;
+    }
+  }
+
+  async function predict() {
+    const btn = document.getElementById('predict-btn');
+    btn.innerHTML = '<span class="spinner"></span>Predicting...';
+    btn.disabled = true;
+
+    const name = document.getElementById('customer_name').value.trim();
+
+    const payload = {
+      credit_score: parseInt(document.getElementById('credit_score').value),
+      age: parseInt(document.getElementById('age').value),
+      tenure: parseInt(document.getElementById('tenure').value),
+      balance: parseFloat(document.getElementById('balance').value),
+      products_number: parseInt(document.getElementById('products_number').value),
+      credit_card: toggleState.credit_card,
+      active_member: toggleState.active_member,
+      estimated_salary: parseFloat(document.getElementById('estimated_salary').value)
+    };
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      const isChurn = data.churn_prediction === 1;
+      const prob = data.churn_probability;
+      const impact = data.feature_impact;
+      const risk = getRisk(prob);
+      const explanation = getExplanation(impact, data.churn_prediction, prob, name);
+
+      const barLabels = {
+        credit_score: 'Credit Score', age: 'Age', tenure: 'Tenure',
+        balance: 'Balance', products_number: 'Number of Products',
+        credit_card: 'Has Credit Card', active_member: 'Active Member',
+        estimated_salary: 'Estimated Salary'
+      };
+
+      const sorted = Object.entries(impact).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+      const maxVal = Math.max(...Object.values(impact).map(Math.abs));
+
+      const barsHTML = sorted.map(([k, v]) => {
+        const pct = Math.round((Math.abs(v) / maxVal) * 50);
+        const cls = v > 0 ? 'pos' : 'neg';
+        const sign = v > 0 ? '+' : '';
+        return `
+          <div class="bar-row">
+            <span class="bar-label">${barLabels[k] || k}</span>
+            <div class="bar-center-track">
+              <div class="bar-center-line"></div>
+              <div class="bar-fill-center ${cls}" style="width:${pct}%"></div>
+              <div class="bar-tooltip">${barLabels[k] || k}<br>Impact : ${sign}${v.toFixed(3)}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+      document.getElementById('right-col').innerHTML = `
+        <div class="verdict-card ${isChurn ? 'churn' : ''}">
+          <div class="verdict-left">
+            <div class="verdict-eyebrow">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Verdict
+            </div>
+            <div class="verdict-title ${isChurn ? 'churn' : ''}">${isChurn ? 'Will Churn' : 'Will Stay'}</div>
+            <div class="verdict-sub">${isChurn ? 'Retention action recommended.' : 'Low churn signal — no action required.'}</div>
+          </div>
+          <div class="verdict-right">
+            <div class="prob-label">Churn probability</div>
+            <div class="prob-value">${Math.round(prob * 100)}<span class="prob-pct">%</span></div>
+            <div class="risk-label">Risk level: <span class="risk-badge ${risk.cls}">${risk.label}</span></div>
+          </div>
+        </div>
+
+        <div class="explain-card">
+          <div class="explain-title">Why the model said this</div>
+          <div class="explain-sub">Red bars push the customer toward churn. Green bars push toward staying. Bar length = strength of contribution.</div>
+          <p style="font-size:14px;color:#1a1d2e;line-height:1.7;margin-bottom:1.25rem;padding:1rem;background:#f8f9ff;border-radius:8px;border-left:3px solid #3b5bdb;">${explanation}</p>
+          ${barsHTML}
+        </div>
+      `;
+
+    } catch (err) {
+      document.getElementById('right-col').innerHTML = `
+        <div class="empty-state">
+          <p>Could not connect to API. Make sure FastAPI is running on port 8000.</p>
+        </div>`;
+    }
+
+    btn.innerHTML = 'Predict churn';
+    btn.disabled = false;
+  }
+</script>
+
+</body>
+</html>
