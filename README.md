@@ -32,7 +32,7 @@ A bank employee enters a customer's details into the web app. The system instant
 
 | Layer | Technology |
 |---|---|
-| **ML Models** | Scikit-learn, XGBoost, Random Forest |
+| **ML Models** | logistic-regression, XGBoost, Random Forest |
 | **Explainability** | SHAP (SHapley Additive Explanations) |
 | **Hyperparameter Tuning** | GridSearchCV |
 | **API Backend** | FastAPI + Uvicorn |
