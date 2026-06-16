@@ -25,7 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-model=joblib.load('C:/Users/aarus/Desktop/projects/bank-churn-mlops/models/random_forest_model.pkl')
+model = joblib.load("random_forest_model.pkl")
 
 class CustomerData(BaseModel):
     credit_score: int
