@@ -188,7 +188,7 @@ Or visit the API docs at: `http://localhost:8000/docs`
 | Service | Platform | URL |
 |---|---|---|
 | Frontend | Vercel | [bank-churn-mlops-eta.vercel.app](https://bank-churn-mlops-eta.vercel.app/) |
-| Backend API | Render | your-render-url.onrender.com |
+| Backend API | Render | (https://bank-churn-mlops.onrender.com/docs)|
 
 ---
 
