@@ -12,3 +12,4 @@ seaborn
 jupyter
 imbalanced-learn
 python-multipart
+shap
