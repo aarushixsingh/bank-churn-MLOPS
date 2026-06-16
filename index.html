@@ -470,7 +470,7 @@
     };
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/predict', {
+      const res = await fetch('https://bank-churn-mlops.onrender.com/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -536,7 +536,7 @@
     } catch (err) {
       document.getElementById('right-col').innerHTML = `
         <div class="empty-state">
-          <p>Could not connect to API. Make sure FastAPI is running on port 8000.</p>
+          <p>Could not connect to API.</p>
         </div>`;
     }
 
