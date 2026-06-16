@@ -2,7 +2,7 @@
 
 
 cors cross origin resource sharing
-# 🏦 Bank Customer Churn Prediction — End-to-End MLOps Project
+# 🏦 Bank Customer Churn Prediction — End-to-End ML Project
 
 > A production-ready machine learning system that predicts whether a bank customer will churn, explains *why* using SHAP, and serves predictions via a REST API with a live interactive frontend.
 
