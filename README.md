@@ -6,7 +6,7 @@ cors cross origin resource sharing
 
 > A production-ready machine learning system that predicts whether a bank customer will churn, explains *why* using SHAP, and serves predictions via a REST API with a live interactive frontend.
 
-🔗 **[Live Demo](https://bank-churn-mlops-eta.vercel.app/)** | 📦 **[API Docs](https://your-render-url.onrender.com/docs)**
+🔗 **[Live Demo](https://bank-churn-mlops-eta.vercel.app/)** | 📦 **[API Docs](https://bank-churn-mlops.onrender.com/docs)**
 
 ---
 
